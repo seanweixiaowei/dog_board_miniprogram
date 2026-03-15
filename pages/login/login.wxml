@@ -1,0 +1,87 @@
+<!-- pages/login/login.wxml -->
+<view class="login-container">
+  <!-- 应用Logo和标题 -->
+  <view class="login-header">
+    <view class="logo-container">
+      <image src="/images/logo.png" mode="aspectFit" class="logo" wx:if="{{false}}" />
+      <view class="logo-placeholder" wx:else>
+        <text class="logo-text">Y</text>
+      </view>
+    </view>
+    <view class="app-title">嘤嘤大师狗狗俱乐部</view>
+    <view class="app-subtitle">Yiin Kennel Club</view>
+  </view>
+
+  <!-- 登录表单 -->
+  <view class="login-form">
+    <view class="form-title">用户登录</view>
+
+    <!-- 错误信息 -->
+    <view wx:if="{{errorMessage}}" class="error-message">
+      {{errorMessage}}
+    </view>
+
+    <!-- 手机号输入 -->
+    <view class="form-group">
+      <view class="form-label">手机号</view>
+      <input
+        class="form-input"
+        type="number"
+        placeholder="请输入11位手机号"
+        maxlength="11"
+        value="{{phoneNumber}}"
+        bindinput="onPhoneInput"
+        bindfocus="clearError"
+      />
+    </view>
+
+    <!-- 密码输入 -->
+    <view class="form-group">
+      <view class="form-label">密码</view>
+      <input
+        class="form-input"
+        password
+        placeholder="请输入密码"
+        value="{{password}}"
+        bindinput="onPasswordInput"
+        bindfocus="clearError"
+      />
+    </view>
+
+    <!-- 登录按钮 -->
+    <button
+      class="login-btn btn-primary"
+      bindtap="onLogin"
+      disabled="{{isLoggingIn || !phoneNumber || !password}}"
+      loading="{{isLoggingIn}}"
+    >
+      {{isLoggingIn ? '登录中...' : '登录'}}
+    </button>
+
+    <!-- 测试快速登录（正式环境可隐藏） -->
+    <view class="quick-login-section">
+      <view class="quick-login-title">测试快速登录</view>
+      <view class="quick-login-buttons">
+        <button class="quick-btn admin-btn" bindtap="onAdminQuickLogin">
+          店长登录
+        </button>
+        <button class="quick-btn viewer-btn" bindtap="onViewerQuickLogin">
+          员工登录
+        </button>
+      </view>
+      <view class="quick-login-hint">
+        <text>店长：全权限操作</text>
+        <text>员工：只读查看</text>
+      </view>
+    </view>
+
+    <!-- 使用说明 -->
+    <view class="instructions">
+      <view class="instruction-title">使用说明：</view>
+      <view class="instruction-item">1. 店长账号拥有所有操作权限（最多2个店长账号）</view>
+      <view class="instruction-item">2. 员工账号只能查看数据，不能编辑</view>
+      <view class="instruction-item">3. 最多支持5个员工账号</view>
+      <view class="instruction-item">4. 如需添加员工账号，请联系店长</view>
+    </view>
+  </view>
+</view>

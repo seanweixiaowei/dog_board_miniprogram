@@ -1,0 +1,16 @@
+<!-- pages/index/index.wxml -->
+<view class="container" style="padding: 0; display: flex; flex-direction: column; justify-content: center; align-items: center; height: 100vh;">
+  <!-- Logo放在左上角 -->
+  <image src="/images/MasterYiin.png" mode="aspectFit" style="position: absolute; top: 20rpx; left: 20rpx; width: 240rpx; height: 240rpx; z-index: 1; background-color: transparent;" />
+
+  <!-- 标题区域居中 -->
+  <view style="text-align: center;">
+    <view style="font-size: 52rpx; font-weight: bold; margin-bottom: 10rpx; letter-spacing: 4rpx;">YiiN KENNEL CLUB</view>
+    <view style="font-size: 36rpx; font-weight: bold; margin-bottom: 10rpx;">嘤嘤大师狗狗俱乐部</view>
+    <view style="font-size: 28rpx; color: #666; margin-bottom: 60rpx;">房间管理系统</view>
+
+    <view style="display: flex; flex-direction: column; gap: 30rpx; margin-top: 80rpx;">
+      <button class="btn btn-primary" bindtap="navigateToDashboard">进入系统</button>
+    </view>
+  </view>
+</view>

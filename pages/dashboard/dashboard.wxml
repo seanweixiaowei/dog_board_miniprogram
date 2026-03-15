@@ -1,0 +1,232 @@
+<!-- pages/dashboard/dashboard.wxml -->
+<view class="container">
+  <view style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 40rpx;">
+    <view class="section-title">系统概览</view>
+    <button class="btn" style="font-size: 24rpx; padding: 10rpx 20rpx;" bindtap="logout">退出登录</button>
+  </view>
+
+  <!-- 统计卡片 -->
+  <view class="stats-grid">
+    <!-- 第一行 -->
+    <view class="stat-card" bindtap="navigateToRooms" data-type="list">
+      <image src="/images/room-total.svg" mode="aspectFit" class="dog-icon" />
+      <view class="stat-number">{{stats.totalRooms}}</view>
+      <view class="stat-label">总房间数</view>
+    </view>
+    <view class="stat-card" bindtap="navigateToDogs" data-type="list">
+      <image src="/images/dog-registered.svg" mode="aspectFit" class="dog-icon" />
+      <view class="stat-number">{{stats.totalDogs}}</view>
+      <view class="stat-label">登记狗狗数</view>
+    </view>
+    <!-- 第二行 -->
+    <view class="stat-card" bindtap="showTodayCheckinsModal">
+      <image src="/images/room-occupied.svg" mode="aspectFit" class="dog-icon" />
+      <view class="stat-number">{{stats.todayScheduledCheckins}}</view>
+      <view class="stat-label">今日应入住</view>
+    </view>
+    <view class="stat-card" bindtap="showNotCheckedInModal">
+      <image src="/images/today-checkin.svg" mode="aspectFit" class="dog-icon" />
+      <view class="stat-number">{{stats.todayNotCheckedIn}}</view>
+      <view class="stat-label">今日未入住</view>
+    </view>
+    <!-- 第三行 -->
+    <view class="stat-card" bindtap="showAvailableRoomsModal">
+      <image src="/images/room-total.svg" mode="aspectFit" class="dog-icon" />
+      <view class="stat-number">{{stats.availableRoomsToday}}</view>
+      <view class="stat-label">空闲房间</view>
+    </view>
+    <view class="stat-card" bindtap="showInStoreDogsModal">
+      <image src="/images/dog-registered.svg" mode="aspectFit" class="dog-icon" />
+      <view class="stat-number">{{stats.inStoreDogs}}</view>
+      <view class="stat-label">在店狗狗</view>
+    </view>
+  </view>
+
+
+  <!-- 今日应入住弹窗 -->
+  <view wx:if="{{showTodayCheckinsModal}}" class="modal-mask" bindtap="closeAllModals">
+    <view class="modal-content" catchtap>
+      <view class="modal-header">
+        <view style="font-size: 36rpx; font-weight: bold;">今日应入住 ({{todayCheckinsList.length}})</view>
+        <button class="btn" style="font-size: 48rpx; background: none; border: none;" bindtap="closeAllModals">×</button>
+      </view>
+      <scroll-view scroll-y style="max-height: 60vh;">
+        <view wx:if="{{todayCheckinsList.length === 0}}" class="loading" style="padding: 40rpx;">
+          今日没有应入住的狗狗
+        </view>
+        <view wx:else>
+          <view class="card" wx:for="{{todayCheckinsList}}" wx:key="id" style="margin-bottom: 20rpx;">
+            <view style="display: flex; justify-content: space-between; align-items: flex-start;">
+              <view>
+                <view style="font-size: 36rpx; font-weight: bold; margin-bottom: 10rpx;">{{item.dogName}}</view>
+                <view style="color: #666; font-size: 28rpx; margin-bottom: 5rpx;">房间: {{item.roomNumber}}</view>
+                <view style="color: #666; font-size: 28rpx; margin-bottom: 5rpx;">入住时间: {{item.checkInTime}}</view>
+                <view style="color: #666; font-size: 28rpx; margin-bottom: 5rpx;">离店时间: {{item.checkOutTime}}</view>
+              </view>
+              <view style="display: flex; flex-direction: column; gap: 10rpx;" wx:if="{{isAdmin}}">
+                <button class="btn btn-primary" style="font-size: 24rpx; padding: 10rpx 20rpx;" bindtap="confirmCheckIn" data-id="{{item.id}}">确认到店</button>
+              </view>
+            </view>
+          </view>
+        </view>
+      </scroll-view>
+    </view>
+  </view>
+
+  <!-- 今日未入住弹窗 -->
+  <view wx:if="{{showNotCheckedInModal}}" class="modal-mask" bindtap="closeAllModals">
+    <view class="modal-content" catchtap>
+      <view class="modal-header">
+        <view style="font-size: 36rpx; font-weight: bold;">今日未入住 ({{notCheckedInList.length}})</view>
+        <button class="btn" style="font-size: 48rpx; background: none; border: none;" bindtap="closeAllModals">×</button>
+      </view>
+      <scroll-view scroll-y style="max-height: 60vh;">
+        <view wx:if="{{notCheckedInList.length === 0}}" class="loading" style="padding: 40rpx;">
+          没有超过预约时间未入住的狗狗
+        </view>
+        <view wx:else>
+          <view class="card" wx:for="{{notCheckedInList}}" wx:key="id" style="margin-bottom: 20rpx;">
+            <view style="display: flex; justify-content: space-between; align-items: flex-start;">
+              <view>
+                <view style="font-size: 36rpx; font-weight: bold; margin-bottom: 10rpx;">{{item.dogName}}</view>
+                <view style="color: #666; font-size: 28rpx; margin-bottom: 5rpx;">房间: {{item.roomNumber}}</view>
+                <view style="color: #666; font-size: 28rpx; margin-bottom: 5rpx;">应入住时间: {{item.checkInTime}}</view>
+                <view style="color: #666; font-size: 28rpx; margin-bottom: 5rpx;">离店时间: {{item.checkOutTime}}</view>
+                <view style="color: #ff4444; font-size: 28rpx; margin-top: 10rpx;">已超过预约时间 {{item.delayHours}} 小时</view>
+              </view>
+              <view style="display: flex; flex-direction: column; gap: 10rpx;" wx:if="{{isAdmin}}">
+                <button class="btn btn-primary" style="font-size: 24rpx; padding: 10rpx 20rpx;" bindtap="confirmCheckIn" data-id="{{item.id}}">确认到店</button>
+                <button class="btn btn-danger" style="font-size: 24rpx; padding: 10rpx 20rpx;" bindtap="cancelBooking" data-id="{{item.id}}">取消预约</button>
+              </view>
+            </view>
+          </view>
+        </view>
+      </scroll-view>
+    </view>
+  </view>
+
+  <!-- 空闲房间弹窗 -->
+  <view wx:if="{{showAvailableRoomsModal}}" class="modal-mask" bindtap="closeAllModals">
+    <view class="modal-content" catchtap style="width: 90%;">
+      <view class="modal-header">
+        <view style="font-size: 36rpx; font-weight: bold;">空闲房间查询</view>
+        <button class="btn" style="font-size: 48rpx; background: none; border: none;" bindtap="closeAllModals">×</button>
+      </view>
+
+      <view wx:if="{{!showAvailableRoomResults}}">
+        <view class="form-group">
+          <view class="form-label">入住日期</view>
+          <picker class="form-input" mode="date" value="{{availableRoomCheckInDate}}" start="{{minDate}}" end="{{maxDate}}" bindchange="onAvailableRoomCheckInDateChange">
+            <view wx:if="{{availableRoomCheckInDate}}">{{availableRoomCheckInDate}}</view>
+            <view wx:else>选择入住日期</view>
+          </picker>
+        </view>
+
+        <view class="form-group">
+          <view class="form-label">离店日期</view>
+          <picker class="form-input" mode="date" value="{{availableRoomCheckOutDate}}" start="{{minDate}}" end="{{maxDate}}" bindchange="onAvailableRoomCheckOutDateChange">
+            <view wx:if="{{availableRoomCheckOutDate}}">{{availableRoomCheckOutDate}}</view>
+            <view wx:else>选择离店日期</view>
+          </picker>
+        </view>
+
+        <view class="form-group">
+          <view class="form-label">房间类型</view>
+          <picker class="form-input" value="{{availableRoomTypeIndex}}" range="{{roomTypeOptions}}" range-key="label" bindchange="onAvailableRoomTypeChange">
+            <view>{{roomTypeOptions[availableRoomTypeIndex].label}}</view>
+          </picker>
+        </view>
+
+        <view class="form-actions" style="margin-top: 40rpx;">
+          <button class="btn btn-primary" bindtap="queryAvailableRooms">查询</button>
+          <button class="btn" bindtap="closeAllModals">取消</button>
+        </view>
+      </view>
+
+      <view wx:else>
+        <view style="margin-bottom: 30rpx;">
+          <view style="font-size: 28rpx; color: #666; margin-bottom: 10rpx;">查询结果: {{availableRoomCheckInDate}} 至 {{availableRoomCheckOutDate}}</view>
+          <view style="font-size: 28rpx; color: #666;">房间类型: {{roomTypeOptions[availableRoomTypeIndex].label}}</view>
+          <view style="font-size: 28rpx; color: #666;">显示日期范围: 入住前3天至离店后3天</view>
+        </view>
+
+        <view style="overflow-x: auto;">
+          <view wx:if="{{availableRoomResults}}" style="display: inline-block; min-width: 100%;">
+            <!-- Excel表格样式展示 -->
+            <view style="border: 2rpx solid #000; min-width: {{(availableRoomResults.roomNumbers.length + 1) * 120}}rpx;">
+              <!-- 第一行：房间号 -->
+              <view style="display: flex; border-bottom: 2rpx solid #000;">
+                <!-- 第一列：左上角空白单元格 -->
+                <view style="width: 120rpx; min-width: 120rpx; background-color: #f8f8f8; padding: 20rpx; text-align: center; border-right: 2rpx solid #000; font-weight: bold; flex-shrink: 0;">
+                  日期\房间
+                </view>
+                <!-- 房间号列 -->
+                <view wx:for="{{availableRoomResults.roomNumbers}}" wx:key="index" style="width: 120rpx; min-width: 120rpx; background-color: #f8f8f8; padding: 20rpx; text-align: center; border-right: 2rpx solid #000; font-weight: bold; flex-shrink: 0;">
+                  {{item}}
+                </view>
+              </view>
+
+              <!-- 日期行 -->
+              <view wx:for="{{availableRoomResults.dates}}" wx:key="index" wx:for-index="dateIndex">
+                <view style="display: flex; border-bottom: {{dateIndex === availableRoomResults.dates.length - 1 ? 'none' : '2rpx solid #000'}};">
+                  <!-- 第一列：日期 -->
+                  <view style="width: 120rpx; min-width: 120rpx; background-color: #f8f8f8; padding: 20rpx; text-align: center; border-right: 2rpx solid #000; font-weight: bold; flex-shrink: 0;">
+                    {{item}}
+                  </view>
+                  <!-- 房间单元格 -->
+                  <view wx:for="{{availableRoomResults.matrix}}" wx:key="roomIndex" wx:for-index="roomIndex"
+                    style="width: 120rpx; min-width: 120rpx; padding: 20rpx; text-align: center; border-right: 2rpx solid #000; flex-shrink: 0; {{availableRoomResults.matrix[roomIndex][dateIndex].isBooked ? 'background-color: #000; color: #fff;' : 'background-color: #fff; color: #333;'}}">
+                    <view wx:if="{{availableRoomResults.matrix[roomIndex][dateIndex].isBooked}}">
+                      {{availableRoomResults.matrix[roomIndex][dateIndex].dogName}}
+                    </view>
+                    <view wx:else>
+                      -
+                    </view>
+                  </view>
+                </view>
+              </view>
+            </view>
+          </view>
+        </view>
+
+        <view class="form-actions" style="margin-top: 40rpx;">
+          <button class="btn" bindtap="backToAvailableRoomQuery">返回查询</button>
+          <button class="btn" bindtap="closeAllModals">关闭</button>
+        </view>
+      </view>
+    </view>
+  </view>
+
+  <!-- 在店狗狗弹窗 -->
+  <view wx:if="{{showInStoreDogsModal}}" class="modal-mask" bindtap="closeAllModals">
+    <view class="modal-content" catchtap>
+      <view class="modal-header">
+        <view style="font-size: 36rpx; font-weight: bold;">在店狗狗 ({{inStoreDogsList.length}})</view>
+        <button class="btn" style="font-size: 48rpx; background: none; border: none;" bindtap="closeAllModals">×</button>
+      </view>
+      <scroll-view scroll-y style="max-height: 60vh;">
+        <view wx:if="{{inStoreDogsList.length === 0}}" class="loading" style="padding: 40rpx;">
+          当前没有在店狗狗
+        </view>
+        <view wx:else>
+          <view class="card" wx:for="{{inStoreDogsList}}" wx:key="id" style="margin-bottom: 20rpx;">
+            <view style="display: flex; justify-content: space-between; align-items: flex-start;">
+              <view>
+                <view style="font-size: 36rpx; font-weight: bold; margin-bottom: 10rpx;">{{item.dogName}}</view>
+                <view style="color: #666; font-size: 28rpx; margin-bottom: 5rpx;">房间: {{item.roomNumber}}</view>
+                <view style="color: #666; font-size: 28rpx; margin-bottom: 5rpx;">入住时间: {{item.checkInTime}}</view>
+                <view style="color: #666; font-size: 28rpx; margin-bottom: 5rpx;">离店时间: {{item.checkOutTime}}</view>
+                <view style="color: #666; font-size: 28rpx; margin-bottom: 5rpx;">主人: {{item.owner}} ({{item.phone}})</view>
+              </view>
+              <view style="display: flex; flex-direction: column; gap: 10rpx;" wx:if="{{isAdmin}}">
+                <button class="btn" style="font-size: 24rpx; padding: 10rpx 20rpx;" bindtap="modifyBookingFromModal" data-id="{{item.id}}">修改预约</button>
+                <button class="btn btn-danger" style="font-size: 24rpx; padding: 10rpx 20rpx;" bindtap="cancelBooking" data-id="{{item.id}}">取消预约</button>
+              </view>
+            </view>
+          </view>
+        </view>
+      </scroll-view>
+    </view>
+  </view>
+
+</view>

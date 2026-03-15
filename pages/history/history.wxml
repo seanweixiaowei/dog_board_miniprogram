@@ -1,0 +1,44 @@
+<!-- pages/history/history.wxml -->
+<view class="container">
+  <view class="section-title">记录查询</view>
+
+  <!-- 搜索框 -->
+  <view class="card">
+    <view class="search-box">
+      <input class="search-input" placeholder="搜索狗狗名字、主人电话或房间号..." value="{{searchQuery}}" bindinput="onSearchInput" />
+      <button class="btn" bindtap="searchHistory">搜索</button>
+      <picker class="form-input" value="{{selectedTypeIndex}}" range="{{typeOptions}}" range-key="label" bindchange="onTypeChange" style="width: 200rpx;">
+        <view>{{selectedTypeIndex >= 0 ? typeOptions[selectedTypeIndex].label : '选择类型'}}</view>
+      </picker>
+    </view>
+  </view>
+
+  <!-- 搜索结果 -->
+  <view wx:if="{{searchResults.length > 0}}" style="margin-top: 60rpx;">
+    <view style="font-size: 36rpx; margin-bottom: 30rpx; padding-bottom: 20rpx; border-bottom: 4rpx solid #000;">
+      搜索结果 ({{searchResults.length}}条)
+    </view>
+
+    <view class="timeline">
+      <view wx:for="{{searchResults}}" wx:key="index" class="timeline-item">
+        <view style="display: flex; justify-content: space-between; margin-bottom: 10rpx;">
+          <view style="font-size: 32rpx; font-weight: bold;">{{item.dog.name}}</view>
+          <view style="font-size: 24rpx; color: #666;">{{formatDateTime(item.timestamp)}}</view>
+        </view>
+        <view style="color: #666; font-size: 28rpx;">
+          <view>房间: {{item.room.number}} | 主人: {{item.dog.owner}} ({{item.dog.phone}})</view>
+          <view>入住: {{formatDateTime(item.booking.checkInTime)}} | 离店: {{formatDateTime(item.booking.checkOutTime)}}</view>
+          <view>状态: {{item.booking.status === 'active' ? '进行中' : '已取消'}}</view>
+        </view>
+      </view>
+    </view>
+  </view>
+
+  <view wx:elif="{{hasSearched}}" style="text-align: center; padding: 80rpx 0; color: #666;">
+    未找到匹配的记录
+  </view>
+
+  <view wx:else style="text-align: center; padding: 80rpx 0; color: #666;">
+    请输入搜索条件查询记录
+  </view>
+</view>

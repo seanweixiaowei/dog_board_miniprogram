@@ -1,0 +1,155 @@
+<!-- pages/dogs/dogs.wxml -->
+<view class="container">
+  <view class="section-title">狗狗档案管理</view>
+
+  <!-- 搜索框 -->
+  <view class="search-box">
+    <input class="search-input" placeholder="搜索狗狗名字或主人电话..." value="{{searchQuery}}" bindinput="onSearchInput" />
+    <button class="btn" bindtap="searchDogs">搜索</button>
+    <button class="btn btn-primary" bindtap="showAddDogModal" wx:if="{{isAdmin}}">+ 添加狗狗</button>
+  </view>
+
+  <!-- 狗狗列表 -->
+  <view class="table-container">
+    <view wx:if="{{filteredDogs.length === 0}}" class="loading">
+      {{searchQuery ? '未找到匹配的狗狗' : '暂无狗狗档案'}}
+    </view>
+
+    <scroll-view wx:else scroll-y style="height: 800rpx;">
+      <view class="card" wx:for="{{filteredDogs}}" wx:key="id" style="margin-bottom: 20rpx;">
+        <view style="display: flex; justify-content: space-between; align-items: flex-start;">
+          <view>
+            <view style="font-size: 36rpx; font-weight: bold; margin-bottom: 10rpx;">{{item.name}}</view>
+            <view style="color: #666; font-size: 28rpx; margin-bottom: 5rpx;">品种: {{item.breed || '-'}}</view>
+            <view style="color: #666; font-size: 28rpx; margin-bottom: 5rpx;">年龄: {{item.age || '-'}}</view>
+            <view style="color: #666; font-size: 28rpx; margin-bottom: 5rpx;">主人: {{item.owner}} ({{item.phone}})</view>
+
+            <view style="margin-top: 20rpx;">
+              <view wx:if="{{item.status === '在店'}}" class="status-badge status-occupied">
+                {{item.status}}
+              </view>
+              <view wx:else class="status-badge status-available">
+                {{item.status}}
+              </view>
+            </view>
+
+            <!-- 健康信息 -->
+            <view style="margin-top: 20rpx; display: flex; flex-wrap: wrap; gap: 10rpx;">
+              <view wx:if="{{item.vaccinated}}" style="font-size: 24rpx; color: #333;">✓ 疫苗完全</view>
+              <view wx:if="{{item.neutered}}" style="font-size: 24rpx; color: #333;">✓ 已绝育</view>
+              <view wx:if="{{item.dewormed}}" style="font-size: 24rpx; color: #333;">✓ 已驱虫</view>
+              <view wx:if="{{item.bitesPeople}}" style="font-size: 24rpx; color: #333;">! 咬人</view>
+              <view wx:if="{{item.bitesDogs}}" style="font-size: 24rpx; color: #333;">! 咬狗</view>
+            </view>
+          </view>
+
+          <view style="display: flex; flex-direction: column; gap: 10rpx;">
+            <view style="display: flex; flex-direction: column; gap: 10rpx;" wx:if="{{isAdmin}}">
+              <button class="btn" style="font-size: 24rpx; padding: 10rpx 20rpx;" bindtap="editDog" data-id="{{item.id}}">编辑</button>
+              <button class="btn btn-danger" style="font-size: 24rpx; padding: 10rpx 20rpx;" bindtap="deleteDog" data-id="{{item.id}}">删除</button>
+            </view>
+            <button wx:if="{{item.hasBooking}}" class="btn btn-primary" style="font-size: 24rpx; padding: 10rpx 20rpx;" bindtap="bookDog" data-id="{{item.id}}" disabled="{{item.hasBooking}}" wx:if="{{isAdmin}}">
+              已预约
+            </button>
+            <button wx:else class="btn" style="font-size: 24rpx; padding: 10rpx 20rpx;" bindtap="bookDog" data-id="{{item.id}}" wx:if="{{isAdmin}}">
+              预约
+            </button>
+          </view>
+        </view>
+
+        <!-- 特殊要求 -->
+        <view wx:if="{{item.specialNotes}}" style="margin-top: 20rpx; padding-top: 20rpx; border-top: 2rpx solid #eee; color: #666; font-size: 26rpx;">
+          <text style="font-weight: bold;">特殊要求:</text> {{item.specialNotes}}
+        </view>
+      </view>
+    </scroll-view>
+  </view>
+
+  <!-- 添加/编辑狗狗模态框 -->
+  <view wx:if="{{showModal}}" class="modal-mask" bindtap="closeModal">
+    <scroll-view class="modal-content" scroll-y catchtap style="max-height: 80vh;">
+      <view class="modal-header">
+        <view style="font-size: 36rpx; font-weight: bold;">{{isEditing ? '编辑狗狗档案' : '添加狗狗档案'}}</view>
+        <button class="btn" style="font-size: 48rpx; background: none; border: none;" bindtap="closeModal">×</button>
+      </view>
+
+      <form bindsubmit="saveDog">
+        <input type="hidden" name="dogId" value="{{currentDog.id}}" />
+
+        <view style="display: flex; gap: 30rpx; margin-bottom: 30rpx;">
+          <view class="form-group" style="flex: 1;">
+            <view class="form-label">狗狗名字</view>
+            <input class="form-input" name="dogName" value="{{currentDog.name}}" placeholder="请输入狗狗名字" required />
+          </view>
+          <view class="form-group" style="flex: 1;">
+            <view class="form-label">性别</view>
+            <picker class="form-input" name="dogGender" value="{{genderIndex}}" range="{{genderOptions}}" range-key="label" bindchange="onGenderChange">
+              <view wx:if="{{currentDog.gender === 'male'}}">公</view>
+              <view wx:elif="{{currentDog.gender === 'female'}}">母</view>
+              <view wx:elif="{{currentDog.gender === 'unknown'}}">未知</view>
+              <view wx:else>请选择性别</view>
+            </picker>
+          </view>
+        </view>
+
+        <view style="display: flex; gap: 30rpx; margin-bottom: 30rpx;">
+          <view class="form-group" style="flex: 1;">
+            <view class="form-label">品种</view>
+            <input class="form-input" name="dogBreed" value="{{currentDog.breed}}" placeholder="请输入品种" />
+          </view>
+          <view class="form-group" style="flex: 1;">
+            <view class="form-label">年龄</view>
+            <input class="form-input" name="dogAge" value="{{currentDog.age}}" placeholder="例如: 2岁" />
+          </view>
+        </view>
+
+        <view class="form-group">
+          <view class="form-label">健康状况</view>
+          <view style="display: flex; flex-wrap: wrap; gap: 20rpx; margin-top: 10rpx;">
+            <label style="display: flex; align-items: center; gap: 10rpx; font-size: 28rpx;">
+              <checkbox name="dogBitesPeople" checked="{{currentDog.bitesPeople}}" /> 咬人
+            </label>
+            <label style="display: flex; align-items: center; gap: 10rpx; font-size: 28rpx;">
+              <checkbox name="dogBitesDogs" checked="{{currentDog.bitesDogs}}" /> 咬狗
+            </label>
+            <label style="display: flex; align-items: center; gap: 10rpx; font-size: 28rpx;">
+              <checkbox name="dogVaccinated" checked="{{currentDog.vaccinated}}" /> 疫苗完全
+            </label>
+            <label style="display: flex; align-items: center; gap: 10rpx; font-size: 28rpx;">
+              <checkbox name="dogNeutered" checked="{{currentDog.neutered}}" /> 已绝育
+            </label>
+            <label style="display: flex; align-items: center; gap: 10rpx; font-size: 28rpx;">
+              <checkbox name="dogDewormed" checked="{{currentDog.dewormed}}" /> 已驱虫
+            </label>
+          </view>
+        </view>
+
+        <view class="form-group">
+          <view class="form-label">慢性病或其他疾病</view>
+          <textarea class="form-input" name="dogIllnesses" value="{{currentDog.illnesses}}" placeholder="如有慢性病请注明" rows="2" />
+        </view>
+
+        <view style="display: flex; gap: 30rpx; margin-bottom: 30rpx;">
+          <view class="form-group" style="flex: 1;">
+            <view class="form-label">主人姓名</view>
+            <input class="form-input" name="dogOwner" value="{{currentDog.owner}}" placeholder="请输入主人姓名" required />
+          </view>
+          <view class="form-group" style="flex: 1;">
+            <view class="form-label">主人电话</view>
+            <input class="form-input" name="dogPhone" value="{{currentDog.phone}}" placeholder="请输入主人电话" type="number" required />
+          </view>
+        </view>
+
+        <view class="form-group">
+          <view class="form-label">特殊要求</view>
+          <textarea class="form-input" name="dogSpecialNotes" value="{{currentDog.specialNotes}}" placeholder="饮食、作息、医疗等特殊要求" rows="3" />
+        </view>
+
+        <view class="form-actions">
+          <button form-type="submit" class="btn btn-primary" wx:if="{{isAdmin}}">保存</button>
+          <button type="button" class="btn" bindtap="closeModal">取消</button>
+        </view>
+      </form>
+    </scroll-view>
+  </view>
+</view>

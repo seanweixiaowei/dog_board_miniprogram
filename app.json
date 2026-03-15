@@ -1,0 +1,48 @@
+{
+  "pages": [
+    "pages/login/login",
+    "pages/index/index",
+    "pages/dashboard/dashboard",
+    "pages/rooms/rooms",
+    "pages/dogs/dogs",
+    "pages/booking/booking",
+    "pages/history/history"
+  ],
+  "window": {
+    "navigationBarTitleText": "嘤嘤大师狗狗俱乐部",
+    "navigationBarBackgroundColor": "#000000",
+    "navigationBarTextStyle": "white",
+    "backgroundColor": "#f5f5f5",
+    "backgroundTextStyle": "dark",
+    "enablePullDownRefresh": false
+  },
+  "tabBar": {
+    "color": "#999999",
+    "selectedColor": "#000000",
+    "backgroundColor": "#ffffff",
+    "borderStyle": "black",
+    "list": [
+      {
+        "pagePath": "pages/dashboard/dashboard",
+        "text": "仪表盘"
+      },
+      {
+        "pagePath": "pages/dogs/dogs",
+        "text": "狗狗档案"
+      },
+      {
+        "pagePath": "pages/booking/booking",
+        "text": "寄养预约"
+      },
+      {
+        "pagePath": "pages/rooms/rooms",
+        "text": "房间管理"
+      }
+    ]
+  },
+  "networkTimeout": {
+    "request": 10000,
+    "downloadFile": 10000
+  },
+  "debug": false
+}

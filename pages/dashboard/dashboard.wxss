@@ -1,0 +1,10 @@
+/* pages/dashboard/dashboard.wxss */
+.form-row {
+  display: flex;
+  gap: 30rpx;
+  margin-bottom: 30rpx;
+}
+
+.form-row > view {
+  flex: 1;
+}

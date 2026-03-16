@@ -3,10 +3,7 @@
   <!-- 应用Logo和标题 -->
   <view class="login-header">
     <view class="logo-container">
-      <image src="/images/logo.png" mode="aspectFit" class="logo" wx:if="{{false}}" />
-      <view class="logo-placeholder" wx:else>
-        <text class="logo-text">Y</text>
-      </view>
+      <image src="/images/MasterYiin.png" mode="aspectFit" class="logo-image" />
     </view>
     <view class="app-title">嘤嘤大师狗狗俱乐部</view>
     <view class="app-subtitle">Yiin Kennel Club</view>

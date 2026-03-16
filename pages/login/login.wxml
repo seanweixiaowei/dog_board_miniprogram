@@ -50,7 +50,7 @@
 
     <!-- 登录按钮 -->
     <button
-      class="login-btn btn-primary"
+      class="login-btn"
       bindtap="onLogin"
       disabled="{{isLoggingIn || !phoneNumber || !password}}"
       loading="{{isLoggingIn}}"

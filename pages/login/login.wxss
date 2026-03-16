@@ -71,24 +71,26 @@ button {
   position: relative;
 }
 
-.app-title::after {
-  content: "";
-  position: absolute;
-  bottom: -20rpx;
-  left: 50%;
-  transform: translateX(-50%);
-  width: 80rpx;
-  height: 4rpx;
-  background: #000000;
-  border-radius: 2rpx;
-}
 
 .app-subtitle {
   font-size: 28rpx;
   color: #666666;
   letter-spacing: 1rpx;
   font-weight: 500;
-  margin-top: 15rpx;
+  margin-top: 30rpx;
+  position: relative;
+}
+
+.app-subtitle::before {
+  content: "";
+  position: absolute;
+  top: -20rpx;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 80rpx;
+  height: 4rpx;
+  background: #000000;
+  border-radius: 2rpx;
 }
 
 /* 登录表单容器 */
@@ -320,6 +322,13 @@ button {
 
   .app-subtitle {
     font-size: 24rpx;
+    margin-top: 20rpx;
+    position: relative;
+  }
+
+  .app-subtitle::before {
+    top: -15rpx;
+    width: 60rpx;
   }
 
   .login-form {

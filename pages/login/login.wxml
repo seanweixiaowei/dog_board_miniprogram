@@ -9,7 +9,7 @@
   <view class="login-form">
     <!-- 应用标题（替换原来的用户登录标题） -->
     <view class="login-header">
-      <view class="app-title">Yiin Kennel Club</view>
+      <view class="app-title">YiiN KENNEL CLUB</view>
       <view class="app-subtitle">嘤嘤大师狗狗俱乐部</view>
     </view>
 

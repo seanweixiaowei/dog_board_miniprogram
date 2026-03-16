@@ -43,6 +43,7 @@ Page({
 
     // 检查用户权限
     const isAdmin = app.isAdmin();
+    console.log('User isAdmin:', isAdmin, 'userInfo:', app.globalData.userInfo);
     this.setData({ isAdmin });
 
     this.loadDogs();

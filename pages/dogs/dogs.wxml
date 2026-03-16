@@ -75,11 +75,12 @@
 
       <form bindsubmit="saveDog">
         <input type="hidden" name="dogId" value="{{currentDog.id}}" />
+        <input type="hidden" name="dogGender" value="{{currentDog.gender}}" />
 
         <view style="display: flex; gap: 30rpx; margin-bottom: 30rpx;">
           <view class="form-group" style="flex: 1;">
             <view class="form-label">狗狗名字</view>
-            <input class="form-input" name="dogName" value="{{currentDog.name}}" placeholder="请输入狗狗名字" required />
+            <input class="form-input" name="dogName" value="{{currentDog.name}}" placeholder="请输入狗狗名字" />
           </view>
           <view class="form-group" style="flex: 1;">
             <view class="form-label">性别</view>
@@ -132,11 +133,11 @@
         <view style="display: flex; gap: 30rpx; margin-bottom: 30rpx;">
           <view class="form-group" style="flex: 1;">
             <view class="form-label">主人姓名</view>
-            <input class="form-input" name="dogOwner" value="{{currentDog.owner}}" placeholder="请输入主人姓名" required />
+            <input class="form-input" name="dogOwner" value="{{currentDog.owner}}" placeholder="请输入主人姓名" />
           </view>
           <view class="form-group" style="flex: 1;">
             <view class="form-label">主人电话</view>
-            <input class="form-input" name="dogPhone" value="{{currentDog.phone}}" placeholder="请输入主人电话" type="number" required />
+            <input class="form-input" name="dogPhone" value="{{currentDog.phone}}" placeholder="请输入主人电话" type="number" />
           </view>
         </view>
 

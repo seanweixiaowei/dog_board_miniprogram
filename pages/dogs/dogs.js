@@ -233,24 +233,48 @@ Page({
 
   // 保存狗狗
   saveDog(e) {
+    console.log('saveDog called, formData:', e.detail.value);
     const formData = e.detail.value;
     const manager = app.getManager();
 
+    // 调试：打印所有表单字段
+    console.log('Form fields:', Object.keys(formData));
+    console.log('dogName:', formData.dogName);
+    console.log('dogOwner:', formData.dogOwner);
+    console.log('dogPhone:', formData.dogPhone);
+    console.log('currentDog.gender:', this.data.currentDog.gender);
+
     const dogData = {
-      name: formData.dogName,
-      gender: this.data.currentDog.gender,
-      breed: formData.dogBreed,
-      age: formData.dogAge,
-      bitesPeople: !!formData.dogBitesPeople,
-      bitesDogs: !!formData.dogBitesDogs,
-      vaccinated: !!formData.dogVaccinated,
-      neutered: !!formData.dogNeutered,
-      dewormed: !!formData.dogDewormed,
-      illnesses: formData.dogIllnesses,
-      owner: formData.dogOwner,
-      phone: formData.dogPhone,
-      specialNotes: formData.dogSpecialNotes
+      name: formData.dogName || '',
+      gender: this.data.currentDog.gender || 'male',
+      breed: formData.dogBreed || '',
+      age: formData.dogAge || '',
+      bitesPeople: formData.dogBitesPeople === 'true' || formData.dogBitesPeople === true,
+      bitesDogs: formData.dogBitesDogs === 'true' || formData.dogBitesDogs === true,
+      vaccinated: formData.dogVaccinated === 'true' || formData.dogVaccinated === true,
+      neutered: formData.dogNeutered === 'true' || formData.dogNeutered === true,
+      dewormed: formData.dogDewormed === 'true' || formData.dogDewormed === true,
+      illnesses: formData.dogIllnesses || '',
+      owner: formData.dogOwner || '',
+      phone: formData.dogPhone || '',
+      specialNotes: formData.dogSpecialNotes || ''
     };
+
+    console.log('Processed dogData:', dogData);
+
+    // 验证必要字段
+    if (!dogData.name.trim()) {
+      app.showMessage('狗狗名字不能为空', 'error');
+      return;
+    }
+    if (!dogData.owner.trim()) {
+      app.showMessage('主人姓名不能为空', 'error');
+      return;
+    }
+    if (!dogData.phone.trim()) {
+      app.showMessage('主人电话不能为空', 'error');
+      return;
+    }
 
     let success = false;
     let message = '';

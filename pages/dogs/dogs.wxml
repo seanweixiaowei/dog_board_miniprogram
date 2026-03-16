@@ -107,19 +107,19 @@
           <view class="form-label">健康状况</view>
           <view style="display: flex; flex-wrap: wrap; gap: 20rpx; margin-top: 10rpx;">
             <label style="display: flex; align-items: center; gap: 10rpx; font-size: 28rpx;">
-              <checkbox name="dogBitesPeople" checked="{{currentDog.bitesPeople}}" /> 咬人
+              <checkbox name="dogBitesPeople" value="true" checked="{{currentDog.bitesPeople}}" /> 咬人
             </label>
             <label style="display: flex; align-items: center; gap: 10rpx; font-size: 28rpx;">
-              <checkbox name="dogBitesDogs" checked="{{currentDog.bitesDogs}}" /> 咬狗
+              <checkbox name="dogBitesDogs" value="true" checked="{{currentDog.bitesDogs}}" /> 咬狗
             </label>
             <label style="display: flex; align-items: center; gap: 10rpx; font-size: 28rpx;">
-              <checkbox name="dogVaccinated" checked="{{currentDog.vaccinated}}" /> 疫苗完全
+              <checkbox name="dogVaccinated" value="true" checked="{{currentDog.vaccinated}}" /> 疫苗完全
             </label>
             <label style="display: flex; align-items: center; gap: 10rpx; font-size: 28rpx;">
-              <checkbox name="dogNeutered" checked="{{currentDog.neutered}}" /> 已绝育
+              <checkbox name="dogNeutered" value="true" checked="{{currentDog.neutered}}" /> 已绝育
             </label>
             <label style="display: flex; align-items: center; gap: 10rpx; font-size: 28rpx;">
-              <checkbox name="dogDewormed" checked="{{currentDog.dewormed}}" /> 已驱虫
+              <checkbox name="dogDewormed" value="true" checked="{{currentDog.dewormed}}" /> 已驱虫
             </label>
           </view>
         </view>

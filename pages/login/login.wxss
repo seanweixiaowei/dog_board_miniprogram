@@ -66,9 +66,8 @@ button {
   font-size: 48rpx;
   font-weight: 700;
   color: #000000;
-  margin-bottom: 15rpx;
+  margin-bottom: 10rpx;
   letter-spacing: 2rpx;
-  text-transform: uppercase;
   position: relative;
 }
 
@@ -88,8 +87,8 @@ button {
   font-size: 28rpx;
   color: #666666;
   letter-spacing: 1rpx;
-  font-weight: 300;
-  margin-top: 30rpx;
+  font-weight: 500;
+  margin-top: 15rpx;
 }
 
 /* 登录表单容器 */

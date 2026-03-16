@@ -52,101 +52,84 @@ Page({
 
     this.setData({ isLoggingIn: true, errorMessage: '' });
 
-    // 模拟网络请求
-    setTimeout(() => {
-      this.authenticateUser(phoneNumber, password);
-      this.setData({ isLoggingIn: false });
-    }, 500);
+    // 直接调用API登录，不使用setTimeout
+    this.authenticateUser(phoneNumber, password);
   },
 
-  // 用户认证
+  // 用户认证（调用后端API）
   authenticateUser(phoneNumber, password) {
-    // 预定义的授权用户列表
-    // 店长账号：有所有权限
-    // 员工账号：只有查看权限
-    const authorizedUsers = {
-      // 店长账号（全权限） - 最多2个
-      '13800138000': {
-        role: 'admin',
-        name: '店长A',
-        password: 'admin123' // 实际应用中密码应该加密存储
-      },
-      '13800138006': {
-        role: 'admin',
-        name: '店长B',
-        password: 'admin123'
-      },
-      // 员工账号（只读权限） - 最多5个
-      '13800138001': {
-        role: 'viewer',
-        name: '员工A',
-        password: 'viewer123'
-      },
-      '13800138002': {
-        role: 'viewer',
-        name: '员工B',
-        password: 'viewer123'
-      },
-      '13800138003': {
-        role: 'viewer',
-        name: '员工C',
-        password: 'viewer123'
-      },
-      '13800138004': {
-        role: 'viewer',
-        name: '员工D',
-        password: 'viewer123'
-      },
-      '13800138005': {
-        role: 'viewer',
-        name: '员工E',
-        password: 'viewer123'
+    const appInstance = getApp();
+
+    // 调用后端API登录
+    appInstance.apiRequest('POST', '/api/auth/login', {
+      phone_number: phoneNumber,
+      password: password
+    }, false).then(response => {
+      // 登录成功
+      const { token, user } = response;
+
+      // 保存token到全局数据
+      appInstance.globalData.token = token;
+
+      // 转换用户信息格式（兼容前端）
+      const userInfo = {
+        phoneNumber: user.phone_number,
+        role: user.role, // 后端角色: super_admin, manager, staff_edit, staff_view
+        name: user.name,
+        id: user.id,
+        store_id: user.store_id,
+        permissions: user.permissions,
+        loginTime: new Date().toISOString()
+      };
+
+      // 保存到全局数据
+      appInstance.globalData.userInfo = userInfo;
+
+      // 保存到本地存储（方便下次自动登录）
+      try {
+        wx.setStorageSync('userInfo', userInfo);
+        wx.setStorageSync('token', token);
+      } catch (e) {
+        console.error('保存用户信息失败:', e);
       }
-    };
 
-    const user = authorizedUsers[phoneNumber];
+      // 跳转到主页面
+      this.redirectToMainPage(user.role);
+    }).catch(error => {
+      // 登录失败
+      console.error('登录失败:', error);
 
-    if (!user) {
-      this.setData({ errorMessage: '该手机号未授权使用本系统' });
-      return;
-    }
+      let errorMessage = '登录失败';
+      if (error.code === 'INVALID_CREDENTIALS') {
+        errorMessage = '手机号或密码错误';
+      } else if (error.code === 'ACCOUNT_DISABLED') {
+        errorMessage = '用户账号已停用';
+      } else if (error.code === 'NETWORK_ERROR') {
+        errorMessage = '网络连接失败，请检查网络';
+      } else if (error.message) {
+        errorMessage = error.message;
+      }
 
-    if (user.password !== password) {
-      this.setData({ errorMessage: '密码错误' });
-      return;
-    }
-
-    // 登录成功
-    const userInfo = {
-      phoneNumber: phoneNumber,
-      role: user.role,
-      name: user.name,
-      loginTime: new Date().toISOString()
-    };
-
-    // 保存到全局数据
-    app.globalData.userInfo = userInfo;
-
-    // 保存到本地存储（方便下次自动登录）
-    try {
-      wx.setStorageSync('userInfo', userInfo);
-    } catch (e) {
-      console.error('保存用户信息失败:', e);
-    }
-
-    // 跳转到主页面
-    this.redirectToMainPage(user.role);
+      this.setData({ errorMessage });
+      this.setData({ isLoggingIn: false });
+    });
   },
 
   // 跳转到主页面
   redirectToMainPage(role) {
     // 根据角色跳转到不同页面
-    // 管理员和查看者都进入仪表盘
+    // 所有角色都进入仪表盘
     wx.switchTab({
       url: '/pages/dashboard/dashboard',
       success: () => {
-        // 显示欢迎消息
-        const welcomeMsg = role === 'admin' ? '店长，欢迎回来！' : '员工，欢迎查看系统！';
+        // 根据后端角色显示欢迎消息
+        let welcomeMsg = '欢迎回来！';
+        if (role === 'super_admin' || role === 'manager') {
+          welcomeMsg = '店长，欢迎回来！';
+        } else if (role === 'staff_edit' || role === 'staff_view') {
+          welcomeMsg = '员工，欢迎查看系统！';
+        }
+
         wx.showToast({
           title: welcomeMsg,
           icon: 'success',
@@ -175,7 +158,7 @@ Page({
       password = 'viewer123';
     }
 
-    this.setData({ phoneNumber, password });
+    this.setData({ phoneNumber, password, isLoggingIn: true, errorMessage: '' });
     this.authenticateUser(phoneNumber, password);
   },
 

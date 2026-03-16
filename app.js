@@ -1,16 +1,28 @@
 // app.js
 App({
   onLaunch() {
-    // 初始化数据管理
+    // 初始化数据管理（保留本地存储作为备用）
     const manager = this.getManager();
     manager.initStorage();
 
     // 尝试从本地存储恢复用户登录状态
     try {
       const storedUserInfo = wx.getStorageSync('userInfo');
-      if (storedUserInfo && storedUserInfo.phoneNumber) {
+      const storedToken = wx.getStorageSync('token');
+
+      if (storedUserInfo && storedToken) {
+        // 恢复token和用户信息
         this.globalData.userInfo = storedUserInfo;
+        this.globalData.token = storedToken;
         console.log('用户登录状态已恢复:', storedUserInfo.phoneNumber);
+
+        // 可以在这里验证token是否仍然有效（可选）
+        // 如果需要，可以调用/api/auth/me验证token
+      } else if (storedUserInfo) {
+        // 只有用户信息没有token，清空用户信息
+        console.log('发现旧的用户信息但没有token，清除登录状态');
+        wx.removeStorageSync('userInfo');
+        this.globalData.userInfo = null;
       }
     } catch (e) {
       console.error('恢复用户登录状态失败:', e);
@@ -22,13 +34,15 @@ App({
   globalData: {
     userInfo: null,
     manager: null,
-    bookingNavigationData: null  // 用于在tab间传递预约导航数据
+    bookingNavigationData: null,  // 用于在tab间传递预约导航数据
+    apiBaseUrl: 'http://39.102.78.230:3000', // 后端API地址
+    token: null // JWT token
   },
 
   // 获取数据管理器单例
   getManager() {
     if (!this.globalData.manager) {
-      this.globalData.manager = new DogBoardManager();
+      this.globalData.manager = new DogBoardManager(this);
     }
     return this.globalData.manager;
   },
@@ -45,6 +59,60 @@ App({
       title,
       icon: iconMap[type] || 'none',
       duration
+    });
+  },
+
+  // API请求方法
+  apiRequest(method, endpoint, data = null, requireAuth = true) {
+    return new Promise((resolve, reject) => {
+      const url = `${this.globalData.apiBaseUrl}${endpoint}`;
+      const header = {
+        'Content-Type': 'application/json'
+      };
+
+      // 如果需要认证，添加Authorization头
+      if (requireAuth && this.globalData.token) {
+        header['Authorization'] = `Bearer ${this.globalData.token}`;
+      }
+
+      wx.request({
+        url,
+        method,
+        data,
+        header,
+        success: (res) => {
+          const { statusCode, data: responseData } = res;
+
+          if (statusCode >= 200 && statusCode < 300) {
+            // 检查后端API返回格式
+            if (responseData.success === false) {
+              // 后端返回的业务错误
+              reject({
+                error: responseData.error || '请求失败',
+                code: responseData.code || 'UNKNOWN_ERROR',
+                message: responseData.message || '请求失败'
+              });
+            } else {
+              // 请求成功
+              resolve(responseData.data || responseData);
+            }
+          } else {
+            // HTTP状态码错误
+            reject({
+              error: responseData.error || `HTTP ${statusCode}`,
+              code: responseData.code || 'HTTP_ERROR',
+              message: responseData.message || '请求失败'
+            });
+          }
+        },
+        fail: (err) => {
+          reject({
+            error: '网络请求失败',
+            code: 'NETWORK_ERROR',
+            message: err.errMsg || '请检查网络连接'
+          });
+        }
+      });
     });
   },
 
@@ -75,14 +143,37 @@ App({
   // 检查用户是否是管理员
   isAdmin() {
     const userInfo = this.globalData.userInfo;
-    return userInfo && userInfo.role === 'admin';
-  }
+    // 后端角色：super_admin, manager 有管理员权限
+    return userInfo && (userInfo.role === 'super_admin' || userInfo.role === 'manager');
+  },
+
+  // 检查权限（基于后端权限字段）
+  checkPermission(permissionName) {
+    const userInfo = this.globalData.userInfo;
+    if (!userInfo || !userInfo.permissions) {
+      return false;
+    }
+
+    // 管理员有所有权限
+    if (this.isAdmin()) {
+      return true;
+    }
+
+    // 检查具体权限字段
+    return userInfo.permissions[permissionName] === true;
+  },
 });
 
 // 数据管理类
 class DogBoardManager {
-  constructor() {
+  constructor(appInstance) {
+    this.app = appInstance;
     this.storage = wx.getStorageSync ? wx.getStorageSync : null;
+  }
+
+  // API请求辅助方法
+  apiRequest(method, endpoint, data = null, requireAuth = true) {
+    return this.app.apiRequest(method, endpoint, data, requireAuth);
   }
 
   initStorage() {

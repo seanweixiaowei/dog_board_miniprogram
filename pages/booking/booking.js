@@ -39,6 +39,7 @@ Page({
     canCreateBooking: false,
     canFindAvailableRooms: false,
     showAvailableRoomsResult: false,
+    isTimeInvalid: false,  // 时间验证：入住时间是否大于等于离店时间
 
     // 编辑模式
     editingBookingId: null,
@@ -434,7 +435,10 @@ Page({
 
     // 检查日期和时间是否都已选择
     if (!checkInDate || !checkInTime || !checkOutDate || !checkOutTime) {
-      this.setData({ availableRooms: [] });
+      this.setData({
+        availableRooms: [],
+        isTimeInvalid: false  // 时间未完全选择，不算无效
+      });
       this.updateCanFindAvailableRooms();
       return;
     }
@@ -447,8 +451,14 @@ Page({
     const checkInDateTime = combineDateTime(checkInDate, checkInTime);
     const checkOutDateTime = combineDateTime(checkOutDate, checkOutTime);
 
-    if (new Date(checkInDateTime) >= new Date(checkOutDateTime)) {
-      this.setData({ availableRooms: [] });
+    // 检查时间是否有效
+    const isTimeInvalid = new Date(checkInDateTime) >= new Date(checkOutDateTime);
+
+    if (isTimeInvalid) {
+      this.setData({
+        availableRooms: [],
+        isTimeInvalid: isTimeInvalid
+      });
       this.updateCanFindAvailableRooms();
       return;
     }
@@ -457,7 +467,10 @@ Page({
     const roomType = this.data.roomTypeOptions[selectedRoomTypeIndex].value;
     const availableRooms = manager.getAvailableRooms(roomType, checkInDateTime, checkOutDateTime);
 
-    this.setData({ availableRooms });
+    this.setData({
+      availableRooms: availableRooms,
+      isTimeInvalid: false  // 时间有效
+    });
     this.updateCanCreateBooking();
     this.updateCanFindAvailableRooms();
   },
@@ -483,13 +496,17 @@ Page({
     const checkInDateTime = combineDateTime(checkInDate, checkInTime);
     const checkOutDateTime = combineDateTime(checkOutDate, checkOutTime);
 
+    // 检查时间是否有效
+    const isTimeValid = checkInDate && checkInTime && checkOutDate && checkOutTime &&
+                       new Date(checkInDateTime) < new Date(checkOutDateTime);
+
     const canCreate = selectedDogs.length > 0 &&
                       selectedRoomId &&
                       checkInDate &&
                       checkInTime &&
                       checkOutDate &&
                       checkOutTime &&
-                      new Date(checkInDateTime) < new Date(checkOutDateTime);
+                      isTimeValid;
 
     this.setData({ canCreateBooking: canCreate });
   },
@@ -789,11 +806,20 @@ Page({
     const checkInDateTime = combineDateTime(checkInDate, checkInTime);
     const checkOutDateTime = combineDateTime(checkOutDate, checkOutTime);
 
+    // 检查时间是否有效（离店时间必须晚于入住时间）
+    let isTimeInvalid = false;
+    if (checkInDate && checkInTime && checkOutDate && checkOutTime) {
+      isTimeInvalid = new Date(checkInDateTime) >= new Date(checkOutDateTime);
+    }
+
     const canFind = selectedRoomTypeIndex >= 0 &&
                     checkInDate && checkInTime && checkOutDate && checkOutTime &&
-                    new Date(checkInDateTime) < new Date(checkOutDateTime);
+                    !isTimeInvalid;
 
-    this.setData({ canFindAvailableRooms: canFind });
+    this.setData({
+      canFindAvailableRooms: canFind,
+      isTimeInvalid: isTimeInvalid
+    });
   },
 
   // 显示狗狗搜索模态框

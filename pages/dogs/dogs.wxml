@@ -48,10 +48,10 @@
               <button class="btn" style="font-size: 24rpx; padding: 10rpx 20rpx;" bindtap="editDog" data-id="{{item.id}}">编辑</button>
               <button class="btn btn-danger" style="font-size: 24rpx; padding: 10rpx 20rpx;" bindtap="deleteDog" data-id="{{item.id}}">删除</button>
             </view>
-            <button wx:if="{{item.hasBooking}}" class="btn btn-primary" style="font-size: 24rpx; padding: 10rpx 20rpx;" bindtap="bookDog" data-id="{{item.id}}" disabled="{{item.hasBooking}}" wx:if="{{isAdmin}}">
+            <button wx:if="{{item.hasBooking && isAdmin}}" class="btn btn-primary" style="font-size: 24rpx; padding: 10rpx 20rpx;" bindtap="bookDog" data-id="{{item.id}}" disabled="{{item.hasBooking}}">
               已预约
             </button>
-            <button wx:else class="btn" style="font-size: 24rpx; padding: 10rpx 20rpx;" bindtap="bookDog" data-id="{{item.id}}" wx:if="{{isAdmin}}">
+            <button wx:elif="{{!item.hasBooking && isAdmin}}" class="btn" style="font-size: 24rpx; padding: 10rpx 20rpx;" bindtap="bookDog" data-id="{{item.id}}">
               预约
             </button>
           </view>

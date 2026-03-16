@@ -143,7 +143,7 @@
         <view wx:if="{{!checkInDate || !checkInTime || !checkOutDate || !checkOutTime}}" class="loading">
           请先选择入住和离店时间
         </view>
-        <view wx:elif="{{checkInDate && checkInTime && checkOutDate && checkOutTime && new Date(checkInDate + 'T' + checkInTime) >= new Date(checkOutDate + 'T' + checkOutTime)}}" style="text-align: center; padding: 40rpx; color: #333;">
+        <view wx:elif="{{isTimeInvalid}}" style="text-align: center; padding: 40rpx; color: #333;">
           离店时间必须晚于入住时间
         </view>
         <view wx:elif="{{availableRooms.length === 0}}" style="text-align: center; padding: 40rpx; color: #666;">

@@ -25,25 +25,9 @@ const PORT = process.env.PORT || 3000;
 // 安全中间件
 app.use(helmet());
 
-// CORS配置 - 允许微信小程序域名
+// CORS配置 - 允许所有来源（开发环境）
 const corsOptions = {
-  origin: function (origin, callback) {
-    // 允许所有微信小程序来源（本地开发和生产环境）
-    const allowedOrigins = [
-      'https://servicewechat.com', // 微信小程序
-      'http://localhost:5173',      // 本地开发
-      'http://127.0.0.1:5173'       // 本地开发
-    ];
-
-    // 开发环境下允许所有来源
-    if (process.env.NODE_ENV === 'development') {
-      callback(null, true);
-    } else if (!origin || allowedOrigins.indexOf(origin) !== -1) {
-      callback(null, true);
-    } else {
-      callback(new Error('不允许的跨域请求'));
-    }
-  },
+  origin: true,  // 允许所有来源
   credentials: true
 };
 app.use(cors(corsOptions));

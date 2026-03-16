@@ -244,12 +244,15 @@ class DogBoardManager {
       }
 
       let nextId = wx.getStorageSync('nextId');
-      if (!nextId) {
-        wx.setStorageSync('nextId', {
+      // 检查nextId是否为有效对象，如果不是则重新初始化
+      if (!nextId || typeof nextId !== 'object' || !nextId.room || !nextId.dog || !nextId.booking) {
+        console.warn('nextId数据异常，重新初始化:', nextId);
+        nextId = {
           room: 100,
           dog: 1000,
           booking: 10000
-        });
+        };
+        wx.setStorageSync('nextId', nextId);
       }
     } catch (e) {
       console.error('初始化存储失败:', e);

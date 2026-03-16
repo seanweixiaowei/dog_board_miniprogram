@@ -1,6 +1,13 @@
 // app.js
+// 引入配置
+const configModule = require('./config.js');
+const config = configModule.current;
+
 App({
   onLaunch() {
+    console.log('小程序初始化完成，当前环境:', configModule.getEnv());
+    console.log('API地址:', config.apiBaseUrl);
+
     // 初始化数据管理（保留本地存储作为备用）
     const manager = this.getManager();
     manager.initStorage();
@@ -27,15 +34,13 @@ App({
     } catch (e) {
       console.error('恢复用户登录状态失败:', e);
     }
-
-    console.log('小程序初始化完成');
   },
 
   globalData: {
     userInfo: null,
     manager: null,
     bookingNavigationData: null,  // 用于在tab间传递预约导航数据
-    apiBaseUrl: 'http://39.102.78.230:3000', // 后端API地址
+    apiBaseUrl: config.apiBaseUrl, // 从配置中获取API地址
     token: null // JWT token
   },
 
@@ -62,10 +67,52 @@ App({
     });
   },
 
+  // 获取API基础地址（支持本地存储覆盖）
+  getApiBaseUrl() {
+    // 首先尝试从本地存储读取自定义API地址
+    try {
+      const customApiUrl = wx.getStorageSync('customApiBaseUrl');
+      if (customApiUrl && typeof customApiUrl === 'string') {
+        console.log('使用自定义API地址:', customApiUrl);
+        return customApiUrl;
+      }
+    } catch (e) {
+      console.error('读取自定义API地址失败:', e);
+    }
+
+    // 使用默认配置
+    return this.globalData.apiBaseUrl;
+  },
+
+  // 设置自定义API地址
+  setApiBaseUrl(url) {
+    try {
+      wx.setStorageSync('customApiBaseUrl', url);
+      console.log('已保存自定义API地址:', url);
+      return true;
+    } catch (e) {
+      console.error('保存自定义API地址失败:', e);
+      return false;
+    }
+  },
+
+  // 清除自定义API地址
+  clearApiBaseUrl() {
+    try {
+      wx.removeStorageSync('customApiBaseUrl');
+      console.log('已清除自定义API地址');
+      return true;
+    } catch (e) {
+      console.error('清除自定义API地址失败:', e);
+      return false;
+    }
+  },
+
   // API请求方法
   apiRequest(method, endpoint, data = null, requireAuth = true) {
     return new Promise((resolve, reject) => {
-      const url = `${this.globalData.apiBaseUrl}${endpoint}`;
+      const apiBaseUrl = this.getApiBaseUrl();
+      const url = `${apiBaseUrl}${endpoint}`;
       const header = {
         'Content-Type': 'application/json'
       };

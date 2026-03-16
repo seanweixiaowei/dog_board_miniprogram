@@ -2,7 +2,10 @@
 <view class="container">
   <view style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 40rpx;">
     <view class="section-title">系统概览</view>
-    <button class="btn" style="font-size: 24rpx; padding: 10rpx 20rpx;" bindtap="logout">退出登录</button>
+    <view style="display: flex; gap: 15rpx;">
+      <button class="btn" style="font-size: 24rpx; padding: 10rpx 20rpx;" bindtap="goToSettings">设置</button>
+      <button class="btn" style="font-size: 24rpx; padding: 10rpx 20rpx;" bindtap="logout">退出登录</button>
+    </view>
   </view>
 
   <!-- 统计卡片 -->

@@ -571,6 +571,13 @@ Page({
     wx.stopPullDownRefresh();
   },
 
+  // 跳转到设置页面
+  goToSettings() {
+    wx.navigateTo({
+      url: '/pages/settings/settings'
+    });
+  },
+
   // 退出登录
   logout() {
     const app = getApp();

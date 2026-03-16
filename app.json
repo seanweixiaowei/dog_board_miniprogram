@@ -6,7 +6,8 @@
     "pages/rooms/rooms",
     "pages/dogs/dogs",
     "pages/booking/booking",
-    "pages/history/history"
+    "pages/history/history",
+    "pages/settings/settings"
   ],
   "window": {
     "navigationBarTitleText": "嘤嘤大师狗狗俱乐部",

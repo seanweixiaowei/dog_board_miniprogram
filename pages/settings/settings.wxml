@@ -1,0 +1,107 @@
+<!-- pages/settings/settings.wxml -->
+<view class="container">
+  <view class="section-title">设置</view>
+
+  <!-- API地址设置 -->
+  <view class="card">
+    <view style="font-size: 36rpx; font-weight: bold; margin-bottom: 30rpx; color: #333;">
+      API服务器地址设置
+    </view>
+
+    <view style="margin-bottom: 40rpx;">
+      <view style="color: #666; font-size: 28rpx; margin-bottom: 15rpx;">
+        当前API地址:
+      </view>
+      <view style="background-color: #f8f8f8; padding: 25rpx; border-radius: 10rpx; font-size: 28rpx; color: #333;">
+        {{currentApiUrl}}
+      </view>
+    </view>
+
+    <!-- 输入新的API地址 -->
+    <view style="margin-bottom: 40rpx;">
+      <view class="form-label" style="margin-bottom: 15rpx;">输入新的API地址</view>
+      <input
+        class="form-input"
+        placeholder="例如: https://your-domain.com"
+        value="{{newApiUrl}}"
+        bindinput="onApiUrlInput"
+        style="margin-bottom: 20rpx;"
+      />
+      <view style="color: #999; font-size: 24rpx; margin-bottom: 25rpx;">
+        注意:
+        <view>• 手机真机测试必须使用HTTPS协议</view>
+        <view>• 示例: https://39.102.78.230:3000</view>
+        <view>• 端口号必须明确指定</view>
+      </view>
+    </view>
+
+    <!-- 操作按钮 -->
+    <view class="form-actions">
+      <button class="btn btn-primary" bindtap="saveApiUrl" disabled="{{!newApiUrl || newApiUrl === currentApiUrl}}">
+        保存设置
+      </button>
+      <button class="btn" bindtap="resetToDefault">
+        恢复默认
+      </button>
+      <button class="btn btn-danger" bindtap="clearApiUrl" wx:if="{{hasCustomApiUrl}}">
+        清除自定义设置
+      </button>
+    </view>
+
+    <!-- 测试连接 -->
+    <view style="margin-top: 50rpx;">
+      <view style="font-size: 32rpx; font-weight: bold; margin-bottom: 20rpx; color: #333;">
+        测试连接
+      </view>
+      <button class="btn" bindtap="testConnection" disabled="{{!currentApiUrl}}">
+        测试API连接
+      </button>
+      <view wx:if="{{testResult}}" style="margin-top: 20rpx; padding: 20rpx; background-color: {{testResult.success ? '#d4edda' : '#f8d7da'}}; border-radius: 10rpx; color: {{testResult.success ? '#155724' : '#721c24'}};">
+        {{testResult.message}}
+        <view wx:if="{{testResult.details}}" style="margin-top: 10rpx; font-size: 24rpx;">
+          详细信息: {{testResult.details}}
+        </view>
+      </view>
+    </view>
+
+    <!-- 使用说明 -->
+    <view style="margin-top: 50rpx; padding-top: 30rpx; border-top: 2rpx solid #eee;">
+      <view style="font-size: 32rpx; font-weight: bold; margin-bottom: 20rpx; color: #333;">
+        使用说明
+      </view>
+      <view style="color: #666; font-size: 26rpx; line-height: 1.6;">
+        <view>1. <text style="font-weight: bold;">开发者工具测试</text>: 使用默认HTTP地址即可</view>
+        <view>2. <text style="font-weight: bold;">手机真机测试</text>:</view>
+        <view style="margin-left: 40rpx;">
+          • 需要HTTPS协议和合法域名
+          <view>• 方案A: 配置HTTPS证书</view>
+          <view>• 方案B: 使用内网穿透服务</view>
+          <view>• 方案C: 使用微信云开发</view>
+        </view>
+        <view style="margin-top: 15rpx;">
+          <text style="font-weight: bold;">推荐方案</text>: 使用 ngrok 等内网穿透工具
+          <view>命令示例: ngrok http 3000</view>
+          <view>然后将生成的HTTPS地址填入上方</view>
+        </view>
+      </view>
+    </view>
+  </view>
+
+  <!-- 快速操作 -->
+  <view style="margin-top: 40rpx;">
+    <view style="font-size: 32rpx; font-weight: bold; margin-bottom: 20rpx; color: #333;">
+      快速操作
+    </view>
+    <view style="display: flex; flex-direction: column; gap: 20rpx;">
+      <button class="btn" bindtap="copyCurrentUrl">
+        复制当前地址
+      </button>
+      <button class="btn" bindtap="goToLogin">
+        返回登录页面
+      </button>
+      <button class="btn btn-danger" bindtap="clearAllData">
+        清除所有本地数据
+      </button>
+    </view>
+  </view>
+</view>

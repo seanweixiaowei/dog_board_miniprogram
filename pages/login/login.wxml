@@ -5,15 +5,13 @@
     <image src="/images/MasterYiin.png" mode="aspectFit" class="logo-top-image" />
   </view>
 
-  <!-- 应用标题 -->
-  <view class="login-header">
-    <view class="app-title">嘤嘤大师狗狗俱乐部</view>
-    <view class="app-subtitle">Yiin Kennel Club</view>
-  </view>
-
   <!-- 登录表单 -->
   <view class="login-form">
-    <view class="form-title">用户登录</view>
+    <!-- 应用标题（替换原来的用户登录标题） -->
+    <view class="login-header">
+      <view class="app-title">嘤嘤大师狗狗俱乐部</view>
+      <view class="app-subtitle">Yiin Kennel Club</view>
+    </view>
 
     <!-- 错误信息 -->
     <view wx:if="{{errorMessage}}" class="error-message">

@@ -51,17 +51,14 @@ button {
   z-index: 1;
 }
 
-.logo-container {
-  width: 200rpx;
-  height: 200rpx;
-  margin: 0 auto 40rpx;
-  background-color: transparent;
-  border-radius: 50%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  box-shadow: 0 10rpx 40rpx rgba(0,0,0,0.1);
-  border: 8rpx solid rgba(0,0,0,0.1);
+/* 左上角Logo容器 */
+.logo-top-left {
+  position: absolute;
+  top: 40rpx;
+  left: 40rpx;
+  width: 120rpx;
+  height: 120rpx;
+  z-index: 2;
 }
 
 .logo-placeholder {
@@ -233,7 +230,7 @@ button {
 .quick-login-section {
   margin-top: 60rpx;
   padding-top: 40rpx;
-  border-top: 2rpx solid rgba(255, 255, 255, 0.1);
+  border-top: 2rpx solid rgba(0, 0, 0, 0.1);
 }
 
 .quick-login-title {
@@ -333,10 +330,11 @@ button {
     padding: 40rpx 30rpx;
   }
 
-  .logo-container {
-    width: 160rpx;
-    height: 160rpx;
-    margin-bottom: 30rpx;
+  .logo-top-left {
+    width: 100rpx;
+    height: 100rpx;
+    top: 30rpx;
+    left: 30rpx;
   }
 
   .logo-placeholder {
@@ -398,11 +396,10 @@ button {
   -moz-appearance: textfield;
 }
 
-/* Logo图片样式 */
-.logo-image {
+/* 左上角Logo图片 */
+.logo-top-image {
   width: 100%;
   height: 100%;
-  border-radius: 50%;
 }
 
 @keyframes spin {

@@ -1,10 +1,12 @@
 <!-- pages/login/login.wxml -->
 <view class="login-container">
-  <!-- 应用Logo和标题 -->
+  <!-- 品牌Logo（左上角） -->
+  <view class="logo-top-left">
+    <image src="/images/MasterYiin.png" mode="aspectFit" class="logo-top-image" />
+  </view>
+
+  <!-- 应用标题 -->
   <view class="login-header">
-    <view class="logo-container">
-      <image src="/images/MasterYiin.png" mode="aspectFit" class="logo-image" />
-    </view>
     <view class="app-title">嘤嘤大师狗狗俱乐部</view>
     <view class="app-subtitle">Yiin Kennel Club</view>
   </view>

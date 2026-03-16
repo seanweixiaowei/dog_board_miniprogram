@@ -375,7 +375,19 @@ class DogBoardManager {
 
   addRoom(room) {
     const rooms = this.getRooms();
-    const nextId = wx.getStorageSync('nextId');
+    let nextId = wx.getStorageSync('nextId');
+
+    // 检查nextId是否为有效对象
+    if (!nextId || typeof nextId !== 'object' || !nextId.room) {
+      console.warn('nextId数据异常，重新初始化:', nextId);
+      nextId = {
+        room: 100,
+        dog: 1000,
+        booking: 10000
+      };
+      wx.setStorageSync('nextId', nextId);
+    }
+
     room.id = nextId.room++;
     rooms.push(room);
     const success = this.saveRooms(rooms);
@@ -424,7 +436,20 @@ class DogBoardManager {
 
   addDog(dog) {
     const dogs = this.getDogs();
-    const nextId = wx.getStorageSync('nextId');
+    let nextId = wx.getStorageSync('nextId');
+
+    // 检查nextId是否为有效对象
+    if (!nextId || typeof nextId !== 'object' || !nextId.dog) {
+      console.warn('nextId数据异常，重新初始化:', nextId);
+      nextId = {
+        room: 100,
+        dog: 1000,
+        booking: 10000
+      };
+      // 如果nextId是字符串或其他类型，确保重新存储
+      wx.setStorageSync('nextId', nextId);
+    }
+
     dog.id = nextId.dog++;
     dog.createdAt = new Date().toISOString();
     dogs.push(dog);
@@ -474,7 +499,19 @@ class DogBoardManager {
 
   addBooking(booking) {
     const bookings = this.getBookings();
-    const nextId = wx.getStorageSync('nextId');
+    let nextId = wx.getStorageSync('nextId');
+
+    // 检查nextId是否为有效对象
+    if (!nextId || typeof nextId !== 'object' || !nextId.booking) {
+      console.warn('nextId数据异常，重新初始化:', nextId);
+      nextId = {
+        room: 100,
+        dog: 1000,
+        booking: 10000
+      };
+      wx.setStorageSync('nextId', nextId);
+    }
+
     booking.id = nextId.booking++;
     booking.createdAt = new Date().toISOString();
     booking.status = 'active';
